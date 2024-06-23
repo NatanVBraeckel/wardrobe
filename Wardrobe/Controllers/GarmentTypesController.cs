@@ -26,7 +26,12 @@ namespace Wardrobe.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GarmentType>>> GetGarmentTypes()
         {
-            var garmentTypes = await _uow.GarmentTypeRepository.GetAllAsync();
+            var garmentTypes = await _uow.GarmentTypeRepository.GetAsync(
+                includes:
+                [
+                    t => t.Garments,
+                ]
+            );
 
             return garmentTypes.ToList();
         }

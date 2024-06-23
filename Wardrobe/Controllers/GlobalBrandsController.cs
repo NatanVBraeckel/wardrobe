@@ -26,7 +26,12 @@ namespace Wardrobe.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GlobalBrand>>> GetGlobalBrands()
         {
-            var globalBrands = await _uow.GlobalBrandRepository.GetAllAsync();
+            var globalBrands = await _uow.GlobalBrandRepository.GetAsync(
+                includes:
+                [
+                    b => b.Garments,
+                ]
+            );
 
             return globalBrands.ToList();
         }

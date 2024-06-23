@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,13 @@ namespace Wardrobe.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            var users = await _uow.UserRepository.GetAllAsync();
+            var users = await _uow.UserRepository.GetAsync(
+                includes:
+                [
+                    u => u.Garments,
+                    u => u.UserBrands
+                ]
+            );
 
             return users.ToList();
         }
