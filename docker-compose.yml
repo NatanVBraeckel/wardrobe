@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  wardrobe.api:
+    image: ${DOCKER_REGISTRY-}wardrobeapi
+    container_name: wardrobe.api
+    build:
+      context: .
+      dockerfile: Wardrobe/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    depends_on:
+      - wardrobe.database
+
+  wardrobe.database:
+    image: postgres:latest
+    container_name: wardrobe.database
+    environment:
+      - POSTGRES_DB=wardrobe
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/wardrobe-db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
