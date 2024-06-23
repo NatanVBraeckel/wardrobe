@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Wardrobe.DAL;
 using Wardrobe.DAL.Data;
 using Wardrobe.DAL.Models;
 
@@ -14,25 +15,27 @@ namespace Wardrobe.API.Controllers
     [ApiController]
     public class UserBrandsController : ControllerBase
     {
-        private readonly WardrobeContext _context;
+        private IUnitOfWork _uow;
 
-        public UserBrandsController(WardrobeContext context)
+        public UserBrandsController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
         // GET: api/UserBrands
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserBrand>>> GetUserBrands()
         {
-            return await _context.UserBrands.ToListAsync();
+            var userBrands = await _uow.UserBrandRepository.GetAllAsync();
+
+            return userBrands.ToList();
         }
 
         // GET: api/UserBrands/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserBrand>> GetUserBrand(int id)
         {
-            var userBrand = await _context.UserBrands.FindAsync(id);
+            var userBrand = await _uow.UserBrandRepository.GetByIDAsync(id);
 
             if (userBrand == null)
             {
@@ -52,11 +55,11 @@ namespace Wardrobe.API.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(userBrand).State = EntityState.Modified;
+            _uow.UserBrandRepository.Update(userBrand);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uow.SaveAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +81,8 @@ namespace Wardrobe.API.Controllers
         [HttpPost]
         public async Task<ActionResult<UserBrand>> PostUserBrand(UserBrand userBrand)
         {
-            _context.UserBrands.Add(userBrand);
-            await _context.SaveChangesAsync();
+            _uow.UserBrandRepository.Insert(userBrand);
+            await _uow.SaveAsync();
 
             return CreatedAtAction("GetUserBrand", new { id = userBrand.Id }, userBrand);
         }
@@ -88,21 +91,21 @@ namespace Wardrobe.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserBrand(int id)
         {
-            var userBrand = await _context.UserBrands.FindAsync(id);
+            var userBrand = await _uow.UserBrandRepository.GetByIDAsync(id);
             if (userBrand == null)
             {
                 return NotFound();
             }
 
-            _context.UserBrands.Remove(userBrand);
-            await _context.SaveChangesAsync();
+            _uow.UserBrandRepository.Delete(id);
+            await _uow.SaveAsync();
 
             return NoContent();
         }
 
         private bool UserBrandExists(int id)
         {
-            return _context.UserBrands.Any(e => e.Id == id);
+            return _uow.UserBrandRepository.Get(e => e.Id == id).Any();
         }
     }
 }

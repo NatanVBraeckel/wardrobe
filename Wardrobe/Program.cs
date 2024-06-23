@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.DAL.Data;
+using Wardrobe.DAL;
 using Wardrobe.DAL.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     options.UseSqlServer(connectionString));*/
 builder.Services.AddDbContext<WardrobeContext>(
     options => options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

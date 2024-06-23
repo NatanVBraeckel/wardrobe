@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Wardrobe.DAL;
 using Wardrobe.DAL.Data;
 using Wardrobe.DAL.Models;
 
@@ -14,25 +15,27 @@ namespace Wardrobe.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly WardrobeContext _context;
+        private IUnitOfWork _uow;
 
-        public UsersController(WardrobeContext context)
+        public UsersController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _uow.UserRepository.GetAllAsync();
+
+            return users.ToList();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _uow.UserRepository.GetByIDAsync(id);
 
             if (user == null)
             {
@@ -52,11 +55,11 @@ namespace Wardrobe.API.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            _uow.UserRepository.Update(user);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uow.SaveAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +81,8 @@ namespace Wardrobe.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            _uow.UserRepository.Insert(user);
+            await _uow.SaveAsync();
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
@@ -88,21 +91,21 @@ namespace Wardrobe.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _uow.UserRepository.GetByIDAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            _uow.UserRepository.Delete(id);
+            await _uow.SaveAsync();
 
             return NoContent();
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _uow.UserRepository.Get(e => e.Id == id).Any();
         }
     }
 }

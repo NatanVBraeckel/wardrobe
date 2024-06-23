@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Wardrobe.DAL;
 using Wardrobe.DAL.Data;
 using Wardrobe.DAL.Models;
 
@@ -14,25 +15,27 @@ namespace Wardrobe.API.Controllers
     [ApiController]
     public class GarmentTypesController : ControllerBase
     {
-        private readonly WardrobeContext _context;
+        private IUnitOfWork _uow;
 
-        public GarmentTypesController(WardrobeContext context)
+        public GarmentTypesController(IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
         // GET: api/GarmentTypes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GarmentType>>> GetGarmentTypes()
         {
-            return await _context.GarmentTypes.ToListAsync();
+            var garmentTypes = await _uow.GarmentTypeRepository.GetAllAsync();
+
+            return garmentTypes.ToList();
         }
 
         // GET: api/GarmentTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<GarmentType>> GetGarmentType(int id)
         {
-            var garmentType = await _context.GarmentTypes.FindAsync(id);
+            var garmentType = await _uow.GarmentTypeRepository.GetByIDAsync(id);
 
             if (garmentType == null)
             {
@@ -52,11 +55,11 @@ namespace Wardrobe.API.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(garmentType).State = EntityState.Modified;
+            _uow.GarmentTypeRepository.Update(garmentType);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uow.SaveAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +81,8 @@ namespace Wardrobe.API.Controllers
         [HttpPost]
         public async Task<ActionResult<GarmentType>> PostGarmentType(GarmentType garmentType)
         {
-            _context.GarmentTypes.Add(garmentType);
-            await _context.SaveChangesAsync();
+            _uow.GarmentTypeRepository.Insert(garmentType);
+            await _uow.SaveAsync();
 
             return CreatedAtAction("GetGarmentType", new { id = garmentType.Id }, garmentType);
         }
@@ -88,21 +91,21 @@ namespace Wardrobe.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGarmentType(int id)
         {
-            var garmentType = await _context.GarmentTypes.FindAsync(id);
+            var garmentType = await _uow.GarmentTypeRepository.GetByIDAsync(id);
             if (garmentType == null)
             {
                 return NotFound();
             }
 
-            _context.GarmentTypes.Remove(garmentType);
-            await _context.SaveChangesAsync();
+            _uow.GarmentTypeRepository.Delete(id);
+            await _uow.SaveAsync();
 
             return NoContent();
         }
 
         private bool GarmentTypeExists(int id)
         {
-            return _context.GarmentTypes.Any(e => e.Id == id);
+            return _uow.GarmentTypeRepository.Get(e => e.Id == id).Any();
         }
     }
 }
