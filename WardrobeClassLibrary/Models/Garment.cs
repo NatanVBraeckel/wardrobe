@@ -21,5 +21,6 @@ namespace Wardrobe.DAL.Models
         public UserBrand? UserBrand { get; set; }
         public GarmentType GarmentType { get; set; }
         public User User { get; set; }
+        public ICollection<Outfit>? Outfits { get; set; }
     }
 }

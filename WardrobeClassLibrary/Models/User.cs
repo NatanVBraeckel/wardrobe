@@ -14,5 +14,6 @@ namespace Wardrobe.DAL.Models
 
         public ICollection<Garment>? Garments { get; set; }
         public ICollection<UserBrand>? UserBrands { get; set; }
+        public ICollection<Outfit>? Outfits { get; set; }
     }
 }

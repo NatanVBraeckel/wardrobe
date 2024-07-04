@@ -32,6 +32,7 @@ namespace Wardrobe.DAL.Data
             modelBuilder.Entity<Garment>().ToTable("Garment");
             modelBuilder.Entity<GarmentType>().ToTable("GarmentType");
             modelBuilder.Entity<GlobalBrand>().ToTable("GlobalBrand");
+            modelBuilder.Entity<Outfit>().ToTable("Outfit");
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<UserBrand>().ToTable("UserBrand");
 
@@ -43,6 +44,9 @@ namespace Wardrobe.DAL.Data
                 .HasIndex(g => g.Name)
                 .IsUnique();
             modelBuilder.Entity<GlobalBrand>()
+                .HasIndex(g => g.Name)
+                .IsUnique();
+            modelBuilder.Entity<Outfit>()
                 .HasIndex(g => g.Name)
                 .IsUnique();
             modelBuilder.Entity<User>()
