@@ -13,6 +13,7 @@ namespace Wardrobe.DAL
         private GenericRepository<Garment> garmentRepository;
         private GenericRepository<GarmentType> garmentTypeRepository;
         private GenericRepository<GlobalBrand> globalBrandRepository;
+        private GenericRepository<Outfit> outfitRepository;
         private GenericRepository<User> userRepository;
         private GenericRepository<UserBrand> userBrandRepository;
 
@@ -54,6 +55,18 @@ namespace Wardrobe.DAL
                     globalBrandRepository = new GenericRepository<GlobalBrand>(_context);
                 }
                 return globalBrandRepository;
+            }
+        }
+
+        public GenericRepository<Outfit> OutfitRepository
+        {
+            get
+            {
+                if (outfitRepository == null)
+                {
+                    outfitRepository = new GenericRepository<Outfit>(_context);
+                }
+                return outfitRepository;
             }
         }
 

@@ -11,6 +11,7 @@ namespace Wardrobe.DAL
         GenericRepository<Garment> GarmentRepository { get; }
         GenericRepository<GarmentType> GarmentTypeRepository { get; }
         GenericRepository<GlobalBrand> GlobalBrandRepository { get; }
+        GenericRepository<Outfit> OutfitRepository { get; }
         GenericRepository<User> UserRepository { get; }
         GenericRepository<UserBrand> UserBrandRepository { get; }
 

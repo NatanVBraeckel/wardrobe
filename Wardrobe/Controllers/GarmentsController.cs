@@ -33,6 +33,7 @@ namespace Wardrobe.API.Controllers
                     g => g.UserBrand,
                     g => g.User,
                     g => g.GarmentType,
+                    g => g.Outfits,
                 ]
             );
 

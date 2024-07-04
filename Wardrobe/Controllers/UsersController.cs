@@ -31,7 +31,8 @@ namespace Wardrobe.API.Controllers
                 includes:
                 [
                     u => u.Garments,
-                    u => u.UserBrands
+                    u => u.UserBrands,
+                    u => u.Outfits,
                 ]
             );
 
